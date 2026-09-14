@@ -62,3 +62,17 @@ export async function updateBook(id: number, input: BookInput): Promise<UpdateBo
 
     return { status: 'ok', book };
 }
+
+export async function removeBook(id: number): Promise<boolean> {
+    const db = await readDb();
+    const index = db.books.findIndex((book) => book.id === id);
+
+    if (index === -1) {
+        return false;
+    }
+
+    db.books.splice(index, 1);
+    await writeDb(db);
+
+    return true;
+}

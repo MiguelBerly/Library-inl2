@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { listBooks, findBookById, createBook, updateBook } from '../services/bookService.ts';
+import { listBooks, findBookById, createBook, updateBook, removeBook } from '../services/bookService.ts';
 import { validateBookInput } from '../validators/bookValidator.ts';
 
 export async function getBooks(_req: Request, res: Response): Promise<void> {
@@ -83,4 +83,22 @@ export async function putBook(req: Request<IdParams>, res: Response): Promise<vo
             res.status(400).json({ error: `No genre with id ${input.genreId}` });
             return;
     }
+}
+
+export async function deleteBook(req: Request<IdParams>, res: Response): Promise<void> {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id < 1) {
+        res.status(400).json({ error: 'Id must be a positive integer' });
+        return;
+    }
+
+    const removed = await removeBook(id);
+
+    if (!removed) {
+        res.status(404).json({ error: `No book with id ${id}` });
+        return;
+    }
+
+    res.sendStatus(204);
 }
