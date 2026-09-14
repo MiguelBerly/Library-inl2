@@ -9,11 +9,18 @@ export async function getBooks(_req: Request, res: Response): Promise<void> {
 
 type IdParams = { id: string };
 
-export async function getBookById(req: Request<IdParams>, res: Response): Promise<void> {
-    const id = Number(req.params.id);
+const INVALID_ID_ERROR = { error: 'Id must be a positive integer' };
 
-    if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ error: 'Id must be a positive integer' });
+function parseId(value: string): number | null {
+    const id = Number(value);
+    return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+export async function getBookById(req: Request<IdParams>, res: Response): Promise<void> {
+    const id = parseId(req.params.id);
+
+    if (id === null) {
+        res.status(400).json(INVALID_ID_ERROR);
         return;
     }
 
@@ -52,10 +59,10 @@ export async function postBook(req: Request, res: Response): Promise<void> {
 }
 
 export async function putBook(req: Request<IdParams>, res: Response): Promise<void> {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
 
-    if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ error: 'Id must be a positive integer' });
+    if (id === null) {
+        res.status(400).json(INVALID_ID_ERROR);
         return;
     }
 
@@ -86,10 +93,10 @@ export async function putBook(req: Request<IdParams>, res: Response): Promise<vo
 }
 
 export async function deleteBook(req: Request<IdParams>, res: Response): Promise<void> {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
 
-    if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ error: 'Id must be a positive integer' });
+    if (id === null) {
+        res.status(400).json(INVALID_ID_ERROR);
         return;
     }
 

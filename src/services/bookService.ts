@@ -1,6 +1,20 @@
 import { readDb, writeDb } from '../db/storage.ts';
-import type { Book } from '../models/types.ts';
+import type { Book, Database } from '../models/types.ts';
 import type { BookInput } from '../validators/bookValidator.ts';
+
+type MissingReference = { status: 'author-not-found' } | { status: 'genre-not-found' };
+
+function findMissingReference(db: Database, input: BookInput): MissingReference | null {
+    if (!db.authors.some((author) => author.id === input.authorId)) {
+        return { status: 'author-not-found' };
+    }
+
+    if (!db.genres.some((genre) => genre.id === input.genreId)) {
+        return { status: 'genre-not-found' };
+    }
+
+    return null;
+}
 
 export async function listBooks(): Promise<Book[]> {
     const db = await readDb();
@@ -12,20 +26,14 @@ export async function findBookById(id: number): Promise<Book | undefined> {
     return db.books.find((book) => book.id === id);
 }
 
-type CreateBookResult =
-    | { status: 'ok'; book: Book }
-    | { status: 'author-not-found' }
-    | { status: 'genre-not-found' };
+type CreateBookResult = { status: 'ok'; book: Book } | MissingReference;
 
 export async function createBook(input: BookInput): Promise<CreateBookResult> {
     const db = await readDb();
+    const missing = findMissingReference(db, input);
 
-    if (!db.authors.some((author) => author.id === input.authorId)) {
-        return { status: 'author-not-found' };
-    }
-
-    if (!db.genres.some((genre) => genre.id === input.genreId)) {
-        return { status: 'genre-not-found' };
+    if (missing) {
+        return missing;
     }
 
     const id = Math.max(0, ...db.books.map((book) => book.id)) + 1;
@@ -47,12 +55,10 @@ export async function updateBook(id: number, input: BookInput): Promise<UpdateBo
         return { status: 'not-found' };
     }
 
-    if (!db.authors.some((author) => author.id === input.authorId)) {
-        return { status: 'author-not-found' };
-    }
+    const missing = findMissingReference(db, input);
 
-    if (!db.genres.some((genre) => genre.id === input.genreId)) {
-        return { status: 'genre-not-found' };
+    if (missing) {
+        return missing;
     }
 
     const book: Book = { id, ...input };
