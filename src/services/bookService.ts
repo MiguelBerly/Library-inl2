@@ -36,3 +36,29 @@ export async function createBook(input: BookInput): Promise<CreateBookResult> {
 
     return { status: 'ok', book };
 }
+
+type UpdateBookResult = CreateBookResult | { status: 'not-found' };
+
+export async function updateBook(id: number, input: BookInput): Promise<UpdateBookResult> {
+    const db = await readDb();
+    const index = db.books.findIndex((book) => book.id === id);
+
+    if (index === -1) {
+        return { status: 'not-found' };
+    }
+
+    if (!db.authors.some((author) => author.id === input.authorId)) {
+        return { status: 'author-not-found' };
+    }
+
+    if (!db.genres.some((genre) => genre.id === input.genreId)) {
+        return { status: 'genre-not-found' };
+    }
+
+    const book: Book = { id, ...input };
+
+    db.books[index] = book;
+    await writeDb(db);
+
+    return { status: 'ok', book };
+}
