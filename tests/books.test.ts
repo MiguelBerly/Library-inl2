@@ -44,3 +44,39 @@ describe('GET /api/books/:id', () => {
         expect(res.body.error).toEqual(expect.any(String));
     });
 });
+
+describe('POST /api/books', () => {
+    const newBook = { title: 'The Fellowship of the Ring', authorId: 1, genreId: 1, year: 1954 };
+
+    it('responds with 201 and the created book with a new id', async () => {
+        const res = await request(app).post('/api/books').send(newBook);
+
+        expect(res.status).toBe(201);
+        expect(res.body.data).toEqual({ id: 4, ...newBook });
+    });
+
+    it('saves the book so it can be fetched afterwards', async () => {
+        const created = await request(app).post('/api/books').send(newBook);
+        const res = await request(app).get(`/api/books/${created.body.data?.id}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data).toMatchObject(newBook);
+    });
+
+    it('responds with 400 and lists the problems when fields are missing or invalid', async () => {
+        const res = await request(app).post('/api/books').send({ title: '', year: 'soon' });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toEqual(expect.any(String));
+        expect(res.body.details).toEqual(
+            expect.arrayContaining([expect.stringMatching(/title/), expect.stringMatching(/year/)]),
+        );
+    });
+
+    it('responds with 400 when the author does not exist', async () => {
+        const res = await request(app).post('/api/books').send({ ...newBook, authorId: 999 });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toMatch(/author/i);
+    });
+});
