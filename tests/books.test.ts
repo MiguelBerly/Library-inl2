@@ -112,3 +112,33 @@ describe('PUT /api/books/:id', () => {
         expect(res.body.details).toEqual(expect.arrayContaining([expect.stringMatching(/title/)]));
     });
 });
+
+describe('DELETE /api/books/:id', () => {
+    it('responds with 204 and an empty body', async () => {
+        const res = await request(app).delete('/api/books/1');
+
+        expect(res.status).toBe(204);
+        expect(res.text).toBe('');
+    });
+
+    it('removes the book so it can no longer be fetched', async () => {
+        await request(app).delete('/api/books/1');
+        const res = await request(app).get('/api/books/1');
+
+        expect(res.status).toBe(404);
+    });
+
+    it('responds with 404 when the book does not exist', async () => {
+        const res = await request(app).delete('/api/books/999');
+
+        expect(res.status).toBe(404);
+        expect(res.body.error).toEqual(expect.any(String));
+    });
+
+    it('responds with 400 when the id is not a positive integer', async () => {
+        const res = await request(app).delete('/api/books/abc');
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toEqual(expect.any(String));
+    });
+});
