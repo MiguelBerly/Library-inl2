@@ -80,3 +80,35 @@ describe('POST /api/books', () => {
         expect(res.body.error).toMatch(/author/i);
     });
 });
+
+describe('PUT /api/books/:id', () => {
+    const updatedBook = { title: 'The Hobbit, or There and Back Again', authorId: 1, genreId: 1, year: 1937 };
+
+    it('responds with 200 and the updated book', async () => {
+        const res = await request(app).put('/api/books/1').send(updatedBook);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data).toEqual({ id: 1, ...updatedBook });
+    });
+
+    it('saves the changes so they can be fetched afterwards', async () => {
+        await request(app).put('/api/books/1').send(updatedBook);
+        const res = await request(app).get('/api/books/1');
+
+        expect(res.body.data).toEqual({ id: 1, ...updatedBook });
+    });
+
+    it('responds with 404 when the book does not exist', async () => {
+        const res = await request(app).put('/api/books/999').send(updatedBook);
+
+        expect(res.status).toBe(404);
+        expect(res.body.error).toEqual(expect.any(String));
+    });
+
+    it('responds with 400 when the body is invalid', async () => {
+        const res = await request(app).put('/api/books/1').send({ title: '' });
+
+        expect(res.status).toBe(400);
+        expect(res.body.details).toEqual(expect.arrayContaining([expect.stringMatching(/title/)]));
+    });
+});
