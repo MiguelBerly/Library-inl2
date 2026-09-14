@@ -1,0 +1,15 @@
+{
+  "genres": [
+    { "id": 1, "name": "Fantasy", "slug": "fantasy" },
+    { "id": 2, "name": "Science Fiction", "slug": "science-fiction" }
+  ],
+  "authors": [
+    { "id": 1, "name": "J.R.R. Tolkien", "nationality": "British" },
+    { "id": 2, "name": "Ursula K. Le Guin", "nationality": "American" }
+  ],
+  "books": [
+    { "id": 1, "title": "The Hobbit", "authorId": 1, "genreId": 1, "year": 1937 },
+    { "id": 2, "title": "The Left Hand of Darkness", "authorId": 2, "genreId": 2, "year": 1969 },
+    { "id": 3, "title": "A Wizard of Earthsea", "authorId": 2, "genreId": 1, "year": 1968 }
+  ]
+}
