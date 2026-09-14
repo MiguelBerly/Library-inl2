@@ -1,11 +1,10 @@
 import express from 'express';
+import bookRoutes from './routes/bookRoutes.ts';
 
 const app = express();
 
 app.use(express.json());
 
-app.get('/api/books', (_req, res) => {
-    res.json({ data: [] });
-});
+app.use('/api/books', bookRoutes);
 
 export default app;
