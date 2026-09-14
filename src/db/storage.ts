@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import type { Database } from '../models/types.ts';
 
 function dbPath(): string {
@@ -8,4 +8,8 @@ function dbPath(): string {
 export async function readDb(): Promise<Database> {
     const raw = await readFile(dbPath(), 'utf-8');
     return JSON.parse(raw) as Database;
+}
+
+export async function writeDb(db: Database): Promise<void> {
+    await writeFile(dbPath(), JSON.stringify(db, null, 2));
 }

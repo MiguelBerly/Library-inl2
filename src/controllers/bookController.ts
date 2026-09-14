@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
-import { listBooks, findBookById } from '../services/bookService.ts';
+import { listBooks, findBookById, createBook } from '../services/bookService.ts';
+import { validateBookInput } from '../validators/bookValidator.ts';
 
 export async function getBooks(_req: Request, res: Response): Promise<void> {
     const books = await listBooks();
@@ -24,4 +25,28 @@ export async function getBookById(req: Request<IdParams>, res: Response): Promis
     }
 
     res.json({ data: book });
+}
+
+export async function postBook(req: Request, res: Response): Promise<void> {
+    const validation = validateBookInput(req.body);
+
+    if (!validation.ok) {
+        res.status(400).json({ error: 'Invalid book', details: validation.errors });
+        return;
+    }
+
+    const input = validation.value;
+    const result = await createBook(input);
+
+    switch (result.status) {
+        case 'ok':
+            res.status(201).json({ data: result.book });
+            return;
+        case 'author-not-found':
+            res.status(400).json({ error: `No author with id ${input.authorId}` });
+            return;
+        case 'genre-not-found':
+            res.status(400).json({ error: `No genre with id ${input.genreId}` });
+            return;
+    }
 }
