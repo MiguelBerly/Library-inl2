@@ -3,10 +3,18 @@ import { listBooks, findBookById, createBook, updateBook, removeBook } from '../
 import type { BookFilter } from '../services/bookService.ts';
 import { validateBookInput } from '../validators/bookValidator.ts';
 import { parseId, INVALID_ID_ERROR } from '../utils/parseId.ts';
+import { parsePagination, paginate } from '../utils/pagination.ts';
 
 type IdParams = { id: string };
 
 export async function getBooks(req: Request, res: Response): Promise<void> {
+    const pagination = parsePagination(req.query);
+
+    if (!pagination.ok) {
+        res.status(400).json({ error: pagination.error });
+        return;
+    }
+
     const { genre, author } = req.query;
     const filter: BookFilter = {};
 
@@ -26,7 +34,7 @@ export async function getBooks(req: Request, res: Response): Promise<void> {
     }
 
     const books = await listBooks(filter);
-    res.json({ data: books });
+    res.json(paginate(books, pagination.value));
 }
 
 export async function getBookById(req: Request<IdParams>, res: Response): Promise<void> {

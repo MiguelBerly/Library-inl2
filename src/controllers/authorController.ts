@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { listAuthors, findAuthorById } from '../services/authorService.ts';
 import { listBooks } from '../services/bookService.ts';
 import { parseId, INVALID_ID_ERROR } from '../utils/parseId.ts';
+import { parsePagination, paginate } from '../utils/pagination.ts';
 
 export async function getAuthors(_req: Request, res: Response): Promise<void> {
     const authors = await listAuthors();
@@ -18,6 +19,13 @@ export async function getAuthorBooks(req: Request<IdParams>, res: Response): Pro
         return;
     }
 
+    const pagination = parsePagination(req.query);
+
+    if (!pagination.ok) {
+        res.status(400).json({ error: pagination.error });
+        return;
+    }
+
     const author = await findAuthorById(id);
 
     if (!author) {
@@ -26,5 +34,5 @@ export async function getAuthorBooks(req: Request<IdParams>, res: Response): Pro
     }
 
     const books = await listBooks({ authorId: author.id });
-    res.json({ data: books });
+    res.json(paginate(books, pagination.value));
 }

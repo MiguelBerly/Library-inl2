@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { listGenres, findGenreBySlug } from '../services/genreService.ts';
 import { listBooks } from '../services/bookService.ts';
+import { parsePagination, paginate } from '../utils/pagination.ts';
 
 export async function getGenres(_req: Request, res: Response): Promise<void> {
     const genres = await listGenres();
@@ -10,6 +11,13 @@ export async function getGenres(_req: Request, res: Response): Promise<void> {
 type SlugParams = { slug: string };
 
 export async function getGenreBooks(req: Request<SlugParams>, res: Response): Promise<void> {
+    const pagination = parsePagination(req.query);
+
+    if (!pagination.ok) {
+        res.status(400).json({ error: pagination.error });
+        return;
+    }
+
     const genre = await findGenreBySlug(req.params.slug);
 
     if (!genre) {
@@ -18,5 +26,5 @@ export async function getGenreBooks(req: Request<SlugParams>, res: Response): Pr
     }
 
     const books = await listBooks({ genre: genre.slug });
-    res.json({ data: books });
+    res.json(paginate(books, pagination.value));
 }
