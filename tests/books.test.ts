@@ -67,6 +67,56 @@ describe('GET /api/books with filters', () => {
     });
 });
 
+describe('GET /api/books with pagination', () => {
+    function ids(res: request.Response): number[] {
+        return res.body.data.map((book: { id: number }) => book.id);
+    }
+
+    it('returns page 1 with a limit of 10 by default, with pagination info', async () => {
+        const res = await request(app).get('/api/books');
+
+        expect(res.body.pagination).toEqual({ page: 1, limit: 10, total: 3, totalPages: 1 });
+    });
+
+    it('returns only as many books as the limit', async () => {
+        const res = await request(app).get('/api/books?limit=2');
+
+        expect(ids(res)).toEqual([1, 2]);
+        expect(res.body.pagination).toEqual({ page: 1, limit: 2, total: 3, totalPages: 2 });
+    });
+
+    it('returns the books on the requested page', async () => {
+        const res = await request(app).get('/api/books?page=2&limit=2');
+
+        expect(ids(res)).toEqual([3]);
+        expect(res.body.pagination).toMatchObject({ page: 2, limit: 2 });
+    });
+
+    it('returns an empty list for a page after the last one', async () => {
+        const res = await request(app).get('/api/books?page=5&limit=2');
+
+        expect(res.status).toBe(200);
+        expect(res.body.data).toEqual([]);
+    });
+
+    it('paginates the filtered result', async () => {
+        const res = await request(app).get('/api/books?genre=fantasy&page=2&limit=1');
+
+        expect(ids(res)).toEqual([3]);
+        expect(res.body.pagination).toEqual({ page: 2, limit: 1, total: 2, totalPages: 2 });
+    });
+
+    it.each(['page=0', 'page=abc', 'limit=0', 'limit=1.5', 'limit=51'])(
+        'responds with 400 for invalid pagination (%s)',
+        async (query) => {
+            const res = await request(app).get(`/api/books?${query}`);
+
+            expect(res.status).toBe(400);
+            expect(res.body.error).toEqual(expect.any(String));
+        },
+    );
+});
+
 describe('GET /api/books/:id', () => {
     it('responds with 200 and the book with that id', async () => {
         const res = await request(app).get('/api/books/2');

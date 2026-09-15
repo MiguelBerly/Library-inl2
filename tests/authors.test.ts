@@ -23,6 +23,13 @@ describe('GET /api/authors/:id/books', () => {
         expect(res.body.data.map((book: { id: number }) => book.id)).toEqual([2, 3]);
     });
 
+    it('paginates the books by the author', async () => {
+        const res = await request(app).get('/api/authors/2/books?page=2&limit=1');
+
+        expect(res.body.data.map((book: { id: number }) => book.id)).toEqual([3]);
+        expect(res.body.pagination).toEqual({ page: 2, limit: 1, total: 2, totalPages: 2 });
+    });
+
     it('responds with 404 when the author does not exist', async () => {
         const res = await request(app).get('/api/authors/999/books');
 

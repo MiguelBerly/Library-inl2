@@ -23,6 +23,13 @@ describe('GET /api/genres/:slug/books', () => {
         expect(res.body.data.map((book: { id: number }) => book.id)).toEqual([1, 3]);
     });
 
+    it('paginates the books in the genre', async () => {
+        const res = await request(app).get('/api/genres/fantasy/books?limit=1');
+
+        expect(res.body.data.map((book: { id: number }) => book.id)).toEqual([1]);
+        expect(res.body.pagination).toEqual({ page: 1, limit: 1, total: 2, totalPages: 2 });
+    });
+
     it('responds with 404 when the genre does not exist', async () => {
         const res = await request(app).get('/api/genres/poetry/books');
 
