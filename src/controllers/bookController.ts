@@ -2,15 +2,9 @@ import type { Request, Response } from 'express';
 import { listBooks, findBookById, createBook, updateBook, removeBook } from '../services/bookService.ts';
 import type { BookFilter } from '../services/bookService.ts';
 import { validateBookInput } from '../validators/bookValidator.ts';
+import { parseId, INVALID_ID_ERROR } from '../utils/parseId.ts';
 
 type IdParams = { id: string };
-
-const INVALID_ID_ERROR = { error: 'Id must be a positive integer' };
-
-function parseId(value: string): number | null {
-    const id = Number(value);
-    return Number.isInteger(id) && id > 0 ? id : null;
-}
 
 export async function getBooks(req: Request, res: Response): Promise<void> {
     const { genre, author } = req.query;
