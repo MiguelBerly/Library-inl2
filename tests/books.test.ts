@@ -22,6 +22,51 @@ describe('GET /api/books', () => {
     });
 });
 
+describe('GET /api/books with filters', () => {
+    function ids(res: request.Response): number[] {
+        return res.body.data.map((book: { id: number }) => book.id);
+    }
+
+    it('returns only books in the given genre', async () => {
+        const res = await request(app).get('/api/books?genre=fantasy');
+
+        expect(res.status).toBe(200);
+        expect(ids(res)).toEqual([1, 3]);
+    });
+
+    it('matches the genre regardless of upper or lower case', async () => {
+        const res = await request(app).get('/api/books?genre=FANTASY');
+
+        expect(ids(res)).toEqual([1, 3]);
+    });
+
+    it('returns only books by the given author', async () => {
+        const res = await request(app).get('/api/books?author=2');
+
+        expect(ids(res)).toEqual([2, 3]);
+    });
+
+    it('combines filters', async () => {
+        const res = await request(app).get('/api/books?genre=fantasy&author=2');
+
+        expect(ids(res)).toEqual([3]);
+    });
+
+    it('returns an empty list when nothing matches', async () => {
+        const res = await request(app).get('/api/books?genre=poetry');
+
+        expect(res.status).toBe(200);
+        expect(res.body.data).toEqual([]);
+    });
+
+    it('responds with 400 when the author filter is not a positive integer', async () => {
+        const res = await request(app).get('/api/books?author=abc');
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toEqual(expect.any(String));
+    });
+});
+
 describe('GET /api/books/:id', () => {
     it('responds with 200 and the book with that id', async () => {
         const res = await request(app).get('/api/books/2');
