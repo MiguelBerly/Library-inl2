@@ -1,6 +1,9 @@
 import type { Book } from '../models/types.ts';
+import { sanitizeText } from '../utils/sanitize.ts';
 
 export type BookInput = Omit<Book, 'id'>;
+
+const MAX_TITLE_LENGTH = 200;
 
 type ValidationResult =
     | { ok: true; value: BookInput }
@@ -15,9 +18,11 @@ export function validateBookInput(body: unknown): ValidationResult {
     const errors: string[] = [];
     const currentYear = new Date().getFullYear();
 
-    const title = typeof input.title === 'string' ? input.title.trim() : '';
+    const title = typeof input.title === 'string' ? sanitizeText(input.title) : '';
     if (title === '') {
         errors.push('title is required and must be a non-empty string');
+    } else if (title.length > MAX_TITLE_LENGTH) {
+        errors.push(`title must be at most ${MAX_TITLE_LENGTH} characters`);
     }
 
     if (!isPositiveInteger(input.authorId)) {
