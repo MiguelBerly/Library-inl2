@@ -15,6 +15,12 @@ npm run dev
 
 The API runs at http://localhost:3000. Run the tests with `npm test`.
 
+## Documentation
+
+Interactive API docs (Swagger UI): **http://localhost:3000/api-docs**
+
+The OpenAPI spec is available as JSON at http://localhost:3000/api-docs.json.
+
 ## Endpoints
 
 | Method | Endpoint | Description |
@@ -30,6 +36,10 @@ The API runs at http://localhost:3000. Run the tests with `npm test`.
 | GET | `/api/authors` | All authors |
 | GET | `/api/authors/:id/books` | Books by an author |
 
+### Pagination
+
+Book lists return 10 books per page. Use `page` and `limit` (max 50), e.g. `/api/books?page=2&limit=5`. The response includes a `pagination` object with `page`, `limit`, `total` and `totalPages`.
+
 ### Creating or updating a book
 
 `POST` and `PUT` take a JSON body where all fields are required:
@@ -38,7 +48,7 @@ The API runs at http://localhost:3000. Run the tests with `npm test`.
 { "title": "Dune", "authorId": 7, "genreId": 2, "year": 1965 }
 ```
 
-`authorId` and `genreId` must belong to an existing author and genre.
+`authorId` and `genreId` must belong to an existing author and genre. HTML is removed from the title before it is saved.
 
 ### Responses
 
@@ -57,6 +67,6 @@ Errors return a message:
 | Status | Meaning |
 |---|---|
 | 200 / 201 / 204 | OK / created / deleted |
-| 400 | Invalid id, filter or body |
+| 400 | Invalid id, filter, page, limit or body |
 | 404 | Not found |
 | 503 | The data file is missing or corrupt |
