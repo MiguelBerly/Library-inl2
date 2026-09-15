@@ -16,9 +16,23 @@ function findMissingReference(db: Database, input: BookInput): MissingReference 
     return null;
 }
 
-export async function listBooks(): Promise<Book[]> {
+export type BookFilter = { genre?: string; authorId?: number };
+
+export async function listBooks(filter: BookFilter = {}): Promise<Book[]> {
     const db = await readDb();
-    return db.books;
+    let books = db.books;
+
+    if (filter.genre !== undefined) {
+        const slug = filter.genre.toLowerCase();
+        const genre = db.genres.find((g) => g.slug === slug);
+        books = genre ? books.filter((book) => book.genreId === genre.id) : [];
+    }
+
+    if (filter.authorId !== undefined) {
+        books = books.filter((book) => book.authorId === filter.authorId);
+    }
+
+    return books;
 }
 
 export async function findBookById(id: number): Promise<Book | undefined> {
