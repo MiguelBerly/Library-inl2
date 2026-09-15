@@ -1,15 +1,36 @@
 {
   "genres": [
     { "id": 1, "name": "Fantasy", "slug": "fantasy" },
-    { "id": 2, "name": "Science Fiction", "slug": "science-fiction" }
+    { "id": 2, "name": "Science Fiction", "slug": "science-fiction" },
+    { "id": 3, "name": "Mystery", "slug": "mystery" },
+    { "id": 4, "name": "Horror", "slug": "horror" }
   ],
   "authors": [
     { "id": 1, "name": "J.R.R. Tolkien", "nationality": "British" },
-    { "id": 2, "name": "Ursula K. Le Guin", "nationality": "American" }
+    { "id": 2, "name": "Ursula K. Le Guin", "nationality": "American" },
+    { "id": 3, "name": "Agatha Christie", "nationality": "British" },
+    { "id": 4, "name": "Isaac Asimov", "nationality": "American" },
+    { "id": 5, "name": "Stephen King", "nationality": "American" },
+    { "id": 6, "name": "Astrid Lindgren", "nationality": "Swedish" },
+    { "id": 7, "name": "Frank Herbert", "nationality": "American" },
+    { "id": 8, "name": "Stieg Larsson", "nationality": "Swedish" }
   ],
   "books": [
     { "id": 1, "title": "The Hobbit", "authorId": 1, "genreId": 1, "year": 1937 },
     { "id": 2, "title": "The Left Hand of Darkness", "authorId": 2, "genreId": 2, "year": 1969 },
-    { "id": 3, "title": "A Wizard of Earthsea", "authorId": 2, "genreId": 1, "year": 1968 }
+    { "id": 3, "title": "A Wizard of Earthsea", "authorId": 2, "genreId": 1, "year": 1968 },
+    { "id": 4, "title": "The Fellowship of the Ring", "authorId": 1, "genreId": 1, "year": 1954 },
+    { "id": 5, "title": "Murder on the Orient Express", "authorId": 3, "genreId": 3, "year": 1934 },
+    { "id": 6, "title": "And Then There Were None", "authorId": 3, "genreId": 3, "year": 1939 },
+    { "id": 7, "title": "Foundation", "authorId": 4, "genreId": 2, "year": 1951 },
+    { "id": 8, "title": "I, Robot", "authorId": 4, "genreId": 2, "year": 1950 },
+    { "id": 9, "title": "The Shining", "authorId": 5, "genreId": 4, "year": 1977 },
+    { "id": 10, "title": "It", "authorId": 5, "genreId": 4, "year": 1986 },
+    { "id": 11, "title": "The Brothers Lionheart", "authorId": 6, "genreId": 1, "year": 1973 },
+    { "id": 12, "title": "Ronia, the Robber's Daughter", "authorId": 6, "genreId": 1, "year": 1981 },
+    { "id": 13, "title": "Dune", "authorId": 7, "genreId": 2, "year": 1965 },
+    { "id": 14, "title": "The Girl with the Dragon Tattoo", "authorId": 8, "genreId": 3, "year": 2005 },
+    { "id": 15, "title": "The Dispossessed", "authorId": 2, "genreId": 2, "year": 1974 },
+    { "id": 16, "title": "Carrie", "authorId": 5, "genreId": 4, "year": 1974 }
   ]
 }
